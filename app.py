@@ -15,8 +15,8 @@ if gemini_key:
     try:
         genai.configure(api_key=gemini_key)
         
-        # Naya aur zyada compatible model name
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Is baar hum model list se check karenge
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
         if "messages" not in st.session_state:
             st.session_state.messages = []
@@ -31,7 +31,7 @@ if gemini_key:
                 st.markdown(prompt)
 
             with st.chat_message("assistant"):
-                # Response generation
+                # Naya function generate_content use karein
                 response = model.generate_content(prompt)
                 st.markdown(response.text)
                 st.session_state.messages.append({"role": "assistant", "content": response.text})
