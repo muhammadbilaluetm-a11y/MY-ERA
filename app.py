@@ -1,5 +1,5 @@
 import streamlit as st
-from groq import Groq
+import google.generativeai as genai
 
 # Page Setup
 st.set_page_config(page_title="MY-ERA AI", page_icon="🌐")
@@ -17,12 +17,14 @@ st.write("Dunya ka har kaam, ab chotkion mein!")
 
 with st.sidebar:
     st.header("Setup")
-    groq_api_key = st.text_input("Apni Groq API Key yahan dalein", type="password")
-    st.info("MY-ERA aapka personal super assistant.")
+    # Yahan humne Gemini Key maangi hai
+    gemini_key = st.text_input("Apni Gemini API Key yahan dalein", type="password")
 
-if groq_api_key:
+if gemini_key:
     try:
-        client = Groq(api_key=groq_api_key)
+        genai.configure(api_key=gemini_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+
         if "messages" not in st.session_state:
             st.session_state.messages = []
 
@@ -36,17 +38,10 @@ if groq_api_key:
                 st.markdown(prompt)
 
             with st.chat_message("assistant"):
-                response = client.chat.completions.create(
-                    model="llama3-70b-8192",
-                    messages=[
-                        {"role": "system", "content": "You are MY-ERA AI, a super intelligent global assistant. Solve any task perfectly."},
-                        *[{"role": m["role"], "content": m["content"]} for m in st.session_state.messages]
-                    ]
-                )
-                reply = response.choices[0].message.content
-                st.markdown(reply)
-                st.session_state.messages.append({"role": "assistant", "content": reply})
+                response = model.generate_content(prompt)
+                st.markdown(response.text)
+                st.session_state.messages.append({"role": "assistant", "content": response.text})
     except Exception as e:
-        st.error(f"Error: {e}")
+        st.error(f"Key sahi nahi hai ya koi masla hai: {e}")
 else:
-    st.warning("Shuru karne ke liye sidebar mein Groq API Key enter karein.")
+    st.warning("Please enter your Gemini API Key in the sidebar to start.")
